@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>European Bank Churn Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: #0a0e27; color: #e0e0e0; min-height: 100vh; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .header { background: linear-gradient(135deg, #0c1445, #1a237e, #283593); padding: 40px; text-align: center; }
+        .header h1 { font-size: 28px; font-weight: 800; color: white; animation: fadeInUp 0.5s ease; }
+        .header p { color: rgba(255,255,255,0.8); margin-top: 8px; font-size: 14px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+        .kpi { padding: 24px; border-radius: 16px; text-align: center; color: white;
+               animation: fadeInUp 0.5s ease both; transition: transform 0.2s; }
+        .kpi:hover { transform: translateY(-4px); }
+        .kpi h2 { font-size: 32px; font-weight: 800; }
+        .kpi p { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-top: 6px; font-weight: 600; }
+        .kpi-1 { background: linear-gradient(135deg, #667eea, #764ba2); animation-delay: 0s; }
+        .kpi-2 { background: linear-gradient(135deg, #f093fb, #f5576c); animation-delay: 0.1s; }
+        .kpi-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); animation-delay: 0.2s; }
+        .kpi-4 { background: linear-gradient(135deg, #fa709a, #fee140); animation-delay: 0.3s; }
+        .kpi-5 { background: linear-gradient(135deg, #667eea, #764ba2); animation-delay: 0.4s; }
+        .section { margin-bottom: 36px; animation: fadeInUp 0.5s ease both; }
+        .section-title { font-size: 20px; font-weight: 700; color: #a5b4fc; margin-bottom: 16px;
+                         padding-bottom: 8px; border-bottom: 3px solid #667eea; }
+        .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+        .chart-card { background: #111736; border-radius: 16px; padding: 16px; transition: transform 0.2s;
+                      box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .chart-card:hover { transform: translateY(-3px); }
+        .chart-card img { width: 100%; border-radius: 10px; }
+        .chart-card h3 { font-size: 14px; color: #a5b4fc; margin-bottom: 10px; font-weight: 600; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; background: #111736; border-radius: 12px; overflow: hidden; }
+        th { background: #1a237e; color: white; padding: 14px 16px; text-align: left; font-size: 13px; font-weight: 600; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e2a5a; font-size: 13px; }
+        tr:hover td { background: #161d42; }
+        .best { background: rgba(102,126,234,0.15); font-weight: 700; color: #a5b4fc; }
+        .insight { background: linear-gradient(135deg, #1a237e, #283593); padding: 20px 24px; border-radius: 12px;
+                   border-left: 4px solid #667eea; margin: 16px 0; font-size: 14px; line-height: 1.7; }
+        .insight b { color: #a5b4fc; }
+        .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0; }
+        .risk-card { padding: 20px; border-radius: 14px; text-align: center; color: white; }
+        .risk-card h2 { font-size: 28px; font-weight: 800; }
+        .risk-card p { font-size: 12px; margin-top: 4px; opacity: 0.9; }
+        .risk-high { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .risk-low { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .footer { text-align: center; padding: 30px; color: rgba(255,255,255,0.5); font-size: 12px; border-top: 1px solid #1e2a5a; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px;
+               background: #111736; color: #a5b4fc; border: 1px solid #1e2a5a; transition: all 0.2s; }
+        .tab:hover, .tab.active { background: #667eea; color: white; border-color: #667eea; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Customer Segmentation & Churn Analytics</h1>
+    <p>European Central Bank &mdash; Powered by Machine Learning | Unified Mentor Internship Project</p>
+</div>
+
+<div class="container">
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+        <div class="kpi kpi-1"><h2>10,000</h2><p>Total Customers</p></div>
+        <div class="kpi kpi-2"><h2>20.4%</h2><p>Churn Rate</p></div>
+        <div class="kpi kpi-3"><h2>7,963</h2><p>Retained</p></div>
+        <div class="kpi kpi-4"><h2>23.1%</h2><p>High-Value Churn</p></div>
+        <div class="kpi kpi-5"><h2>26.9%</h2><p>Inactive Churn</p></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('overview')">Overview</div>
+        <div class="tab" onclick="showTab('geography')">Geography Analysis</div>
+        <div class="tab" onclick="showTab('demographics')">Age & Tenure</div>
+        <div class="tab" onclick="showTab('highvalue')">High-Value Explorer</div>
+        <div class="tab" onclick="showTab('ml')">ML Model Results</div>
+    </div>
+
+    <!-- TAB: Overview -->
+    <div class="tab-content active" id="overview">
+        <div class="section">
+            <div class="section-title">Overall Churn Distribution</div>
+            <div class="chart-grid">
+                <div class="chart-card"><h3>Churn vs Retained</h3><img src="charts/01_overall_churn.png" alt="Overall Churn"></div>
+                <div class="chart-card"><h3>Churn by Gender</h3><img src="charts/04_churn_gender.png" alt="Gender Churn"></div>
+                <div class="chart-card"><h3>Churn by Number of Products</h3><img src="charts/08_churn_products.png" alt="Product Churn"></div>
+                <div class="chart-card"><h3>Active vs Inactive Members</h3><img src="charts/09_churn_activity.png" alt="Activity Churn"></div>
+            </div>
+            <div class="insight"><b>Key Insight:</b> Customers with 3-4 products show significantly higher churn, suggesting over-selling may backfire. Inactive members churn at nearly double the rate of active members.</div>
+        </div>
+    </div>
+
+    <!-- TAB: Geography -->
+    <div class="tab-content" id="geography">
+        <div class="section">
+            <div class="section-title">Geographic Churn Analysis</div>
+            <div class="chart-grid">
+                <div class="chart-card"><h3>Churn Rate by Country</h3><img src="charts/02_churn_geography.png" alt="Geography Churn"></div>
+                <div class="chart-card"><h3>Geography x Age Heatmap</h3><img src="charts/10_heatmap_geo_age.png" alt="Geo Age Heatmap"></div>
+            </div>
+            <div class="section-title" style="margin-top:24px">Geographic Risk Index</div>
+            <div class="risk-grid">
+                <div class="risk-card risk-high"><h2>1.59x</h2><p>Germany</p></div>
+                <div class="risk-card risk-low"><h2>0.82x</h2><p>Spain</p></div>
+                <div class="risk-card risk-low"><h2>0.79x</h2><p>France</p></div>
+            </div>
+            <div class="insight"><b>Key Insight:</b> Germany consistently shows the highest churn rate (1.59x above average) despite having fewer customers than France. This suggests country-specific service quality or competitive pressure issues.</div>
+        </div>
+    </div>
+
+    <!-- TAB: Demographics -->
+    <div class="tab-content" id="demographics">
+        <div class="section">
+            <div class="section-title">Age & Tenure Churn Patterns</div>
+            <div class="chart-grid">
+                <div class="chart-card"><h3>Churn by Age Group</h3><img src="charts/03_churn_age.png" alt="Age Churn"></div>
+                <div class="chart-card"><h3>Churn by Tenure Group</h3><img src="charts/07_churn_tenure.png" alt="Tenure Churn"></div>
+                <div class="chart-card"><h3>Churn by Credit Score Band</h3><img src="charts/05_churn_credit.png" alt="Credit Churn"></div>
+                <div class="chart-card"><h3>Geography x Age Interaction</h3><img src="charts/10_heatmap_geo_age.png" alt="Heatmap"></div>
+            </div>
+            <div class="insight"><b>Key Insight:</b> Customers aged 46-60 show the highest churn across all geographies. New customers (0-2 years tenure) also show elevated churn &mdash; the onboarding experience is critical.</div>
+        </div>
+    </div>
+
+    <!-- TAB: High-Value -->
+    <div class="tab-content" id="highvalue">
+        <div class="section">
+            <div class="section-title">High-Value Customer Churn Explorer</div>
+            <div class="chart-grid">
+                <div class="chart-card"><h3>Churn by Balance Segment</h3><img src="charts/06_churn_balance.png" alt="Balance Churn"></div>
+                <div class="chart-card"><h3>Churn by Credit Score Band</h3><img src="charts/05_churn_credit.png" alt="Credit Churn"></div>
+            </div>
+            <div class="section-title" style="margin-top:24px">Revenue Risk from Churn</div>
+            <div class="risk-grid">
+                <div class="risk-card risk-high"><h2>&euro;185.6M</h2><p>Total Balance Lost</p></div>
+                <div class="risk-card" style="background:linear-gradient(135deg,#fa709a,#fee140)"><h2>&euro;91,109</h2><p>Avg Balance (Churned)</p></div>
+                <div class="risk-card risk-low"><h2>&euro;72,745</h2><p>Avg Balance (Retained)</p></div>
+            </div>
+            <div class="insight"><b>Key Insight:</b> High-balance customers who churn represent significant revenue risk. Targeted premium retention programs (dedicated relationship managers, preferential rates) are essential.</div>
+        </div>
+    </div>
+
+    <!-- TAB: ML -->
+    <div class="tab-content" id="ml">
+        <div class="section">
+            <div class="section-title">Machine Learning Model Results</div>
+            <div class="table-wrap">
+                <table>
+                    <tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>AUC-ROC</th></tr>
+                    <tr><td>Logistic Regression</td><td>80.50%</td><td>58.59%</td><td>14.25%</td><td>22.92%</td><td>0.771</td></tr>
+                    <tr class="best"><td>Random Forest</td><td>86.75%</td><td>82.87%</td><td>43.98%</td><td>57.46%</td><td>0.859</td></tr>
+                    <tr><td>Gradient Boosting</td><td>85.90%</td><td>73.95%</td><td>47.42%</td><td>57.78%</td><td>0.856</td></tr>
+                </table>
+            </div>
+            <div class="chart-grid" style="margin-top:20px">
+                <div class="chart-card"><h3>Feature Importance</h3><img src="charts/12_feature_importance.png" alt="Feature Importance"></div>
+                <div class="chart-card"><h3>Confusion Matrix</h3><img src="charts/13_confusion_matrix.png" alt="Confusion Matrix"></div>
+                <div class="chart-card"><h3>Model Comparison</h3><img src="charts/14_model_comparison.png" alt="Model Comparison"></div>
+                <div class="chart-card"><h3>Correlation Matrix</h3><img src="charts/11_correlation.png" alt="Correlation"></div>
+            </div>
+            <div class="insight"><b>Key Insight:</b> Random Forest and Gradient Boosting significantly outperform Logistic Regression. Age, NumOfProducts, and Balance are the most important features for predicting churn.</div>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    Customer Segmentation & Churn Pattern Analytics in European Banking<br>
+    Unified Mentor Private Limited &mdash; Machine Learning Internship Project<br>
+    Built with Python, Scikit-learn, Matplotlib, Seaborn & Plotly
+</div>
+
+<script>
+function showTab(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
